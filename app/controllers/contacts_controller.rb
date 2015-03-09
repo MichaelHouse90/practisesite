@@ -7,16 +7,24 @@ class ContactsController < ApplicationController
     @contact = Contact.new(contact_params)
     
     if @contact.save
-      redirect_to new_contact_path, notice: "Massege sent." 
+      name = params[:contact][:name]
+      email = params[:contact][:email]
+      body = params[:contact][:body]
+      
+      ContactMailer.contact_email(name,email,body).deliver
+      
+      flash[:success] = 'Massege sent.'
+      redirect_to new_contact_path 
     else
-      redirect_to new_contact_path, notice: "Error occured."
+      flash[:danger] = 'Error occured. Massage has not been sent.'
+      redirect_to new_contact_path
     end
     
   end
   
   private
     def contact_params
-      params.require (:contact).permit (:name, :email, :comments) 
+      params.require(:contact).permit(:name, :email, :comments) 
   
   end
   
